@@ -29,6 +29,9 @@
 
 #include "zsh.mdh"
 #include "hist.pro"
+#include <stdlib.h>
+#include <stdio.h>
+#include <limits.h>
 
 /* Functions to call for getting/ungetting a character and for history
  * word control. */
@@ -2775,6 +2778,10 @@ void
 savehistfile(char *fn, int err, int writeflags)
 {
     char *t, *tmpfile, *start = NULL;
+    char *theuname = NULL;
+    char *thehost = NULL;
+    char *thecontext = NULL;
+    char thecwd[PATH_MAX+1];
     FILE *out;
     Histent he;
     zlong xcurhist = curhist - !!(histactive & HA_ACTIVE);
@@ -2905,11 +2912,21 @@ savehistfile(char *fn, int err, int writeflags)
 	    }
 	    t = start = he->node.nam;
 	    if (extended_history) {
-		ret = fprintf(out, ": %ld:%ld;", (long)he->stim,
-			      he->ftim? (long)(he->ftim - he->stim) : 0L);
+                thecontext = getenv("ZCONTEXT");
+                thehost    = getenv("ZHOSTNAME");
+                theuname   = getenv("ZUNAME");
+                if( getcwd(thecwd, sizeof(thecwd)) == NULL ){
+                    *thecwd = "can't get cwd\0";
+                }
+                ret = fprintf(out, ":ZSH:%s:%s:%s:%s: %ld:%ld;",
+                        theuname,
+                        thehost,
+                        thecwd,
+                        thecontext,
+                        (long)he->stim,
+                        he->ftim? (long)(he->ftim - he->stim) : 0L);
 	    } else if (*t == ':')
 		ret = fputc('\\', out);
-
 	    for (; ret >= 0 && *t; t++) {
 		if (*t == '\n')
 		    if ((ret = fputc('\\', out)) < 0)
