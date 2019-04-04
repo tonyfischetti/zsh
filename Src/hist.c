@@ -2989,8 +2989,8 @@ savehistfile(char *fn, int err, int writeflags)
 		hist_ignore_all_dups |= isset(HISTSAVENODUPS);
 		readhistfile(fn, err, 0);
 		hist_ignore_all_dups = isset(HISTIGNOREALLDUPS);
-		if (histlinect)
-		    savehistfile(fn, err, 0);
+		/* if (histlinect) */
+		/*     savehistfile(fn, err, 0); */
 
 		pophiststack();
 		histactive = remember_histactive;
