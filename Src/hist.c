@@ -2994,7 +2994,7 @@ savehistfile(char *fn, int err, int writeflags)
                 thehost    = getenv("ZHOSTNAME");
                 theuname   = getenv("ZUNAME");
                 if( getcwd(thecwd, sizeof(thecwd)) == NULL ){
-                    *thecwd = "can't get cwd\0";
+                    memcpy(thecwd, "can't get cwd\0", sizeof("can't get cwd\0"));
                 }
                 ret = fprintf(out, ":ZSH:%s:%s:%s:%s: %ld:%ld;",
                         theuname,
